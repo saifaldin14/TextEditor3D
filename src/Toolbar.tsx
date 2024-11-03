@@ -2,10 +2,11 @@ import { useLoader } from "@react-three/fiber";
 import { FontLoader } from "three/examples/jsm/loaders/FontLoader";
 import { TextGeometry } from "three/examples/jsm/geometries/TextGeometry";
 import * as THREE from "three";
-import { TextChunk } from "./types";
 
 interface ToolbarProps {
-  onStyleChange: (style: Partial<TextChunk["style"]>) => void;
+  onStyleChange: (
+    style: Partial<{ bold: boolean; italic: boolean; color: string }>
+  ) => void;
 }
 
 const Toolbar3D = ({ onStyleChange }: ToolbarProps) => {
@@ -21,9 +22,11 @@ const Toolbar3D = ({ onStyleChange }: ToolbarProps) => {
     });
   };
 
-  const handleClick = (style: Partial<TextChunk["style"]>) => () => {
-    onStyleChange(style);
-  };
+  const handleClick =
+    (style: Partial<{ bold: boolean; italic: boolean; color: string }>) =>
+    () => {
+      onStyleChange(style);
+    };
 
   return (
     <group position={[0, 2, 0]}>

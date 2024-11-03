@@ -1,5 +1,5 @@
-import { useLoader, useFrame } from "@react-three/fiber";
-import { useState, useEffect, useRef, KeyboardEvent } from "react";
+import { useLoader } from "@react-three/fiber";
+import { useState, useEffect, useRef } from "react";
 import { FontLoader } from "three/examples/jsm/loaders/FontLoader";
 import { TextGeometry } from "three/examples/jsm/geometries/TextGeometry";
 import * as THREE from "three";
@@ -9,6 +9,7 @@ interface EditableTextProps {
   position: [number, number, number];
   fontSize?: number;
   color?: string;
+  activeStyle?: Partial<{ bold: boolean; italic: boolean; color: string }>;
 }
 
 const EditableText = ({
@@ -16,6 +17,7 @@ const EditableText = ({
   position,
   fontSize = 1,
   color = "lightblue",
+  activeStyle = {},
 }: EditableTextProps) => {
   const font = useLoader(FontLoader, "/fonts/helvetiker_regular.typeface.json");
   const [text, setText] = useState(initialText);
@@ -25,25 +27,31 @@ const EditableText = ({
   const caretRef = useRef<THREE.Mesh>(null);
   const blinkIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Initialize the text geometry whenever the text or font changes
+  // Apply activeStyle to geometry creation
+  const applyStyles = (content: string) => {
+    const size = activeStyle.bold ? fontSize * 1.1 : fontSize;
+    const textColor = activeStyle.color || color;
+
+    return new TextGeometry(content, {
+      font,
+      size: size,
+      height: 0.3,
+      curveSegments: 12,
+      bevelEnabled: activeStyle.bold || false,
+      bevelThickness: 0.03,
+      bevelSize: 0.05,
+      bevelOffset: 0,
+      bevelSegments: 5,
+    });
+  };
+
   useEffect(() => {
     if (font) {
       if (textGeometry) textGeometry.dispose();
-
-      const geometry = new TextGeometry(text, {
-        font: font,
-        size: fontSize,
-        height: 0.3,
-        curveSegments: 12,
-        bevelEnabled: true,
-        bevelThickness: 0.03,
-        bevelSize: 0.05,
-        bevelOffset: 0,
-        bevelSegments: 5,
-      });
+      const geometry = applyStyles(text);
       setTextGeometry(geometry);
     }
-  }, [text, font, fontSize]);
+  }, [text, font, fontSize, activeStyle]);
 
   // Toggle the editing mode on click
   const handleClick = () => {
@@ -99,7 +107,10 @@ const EditableText = ({
           geometry={textGeometry}
           onClick={handleClick}
         >
-          <meshStandardMaterial attach="material" color={color} />
+          <meshStandardMaterial
+            attach="material"
+            color={activeStyle.color || color}
+          />
         </mesh>
       )}
 

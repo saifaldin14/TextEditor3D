@@ -2,26 +2,14 @@ import { Canvas } from "@react-three/fiber";
 import { OrbitControls, Stars } from "@react-three/drei";
 import { useState } from "react";
 import Toolbar3D from "./Toolbar";
-import { RichText, TextChunk } from "./types";
 import EditableText from "./EditableText";
 
 export default function App() {
-  const [richText, setRichText] = useState<RichText>([
-    { content: "Hello, ", style: {} },
-    { content: "world!", style: { bold: true, color: "yellow" } },
-  ]);
+  const [activeStyle, setActiveStyle] = useState({});
 
-  const handleStyleChange = (style: Partial<TextChunk["style"]>) => {
-    // Modify the style of the last text chunk for simplicity
-    setRichText((prev) => {
-      const updatedChunks = [...prev];
-      const lastChunk = updatedChunks[updatedChunks.length - 1];
-      updatedChunks[updatedChunks.length - 1] = {
-        ...lastChunk,
-        style: { ...lastChunk.style, ...style },
-      };
-      return updatedChunks;
-    });
+  // Handle style changes from the toolbar
+  const handleStyleChange = (style: any) => {
+    setActiveStyle((prev) => ({ ...prev, ...style }));
   };
 
   return (
@@ -42,10 +30,14 @@ export default function App() {
       <ambientLight intensity={0.1} />
       <directionalLight intensity={0.2} position={[10, 10, 5]} />
 
-      {/* Render editable rich text */}
-      <EditableText initialText={"Hello World"} position={[0, 1, 0]} />
+      {/* Render editable text with active style */}
+      <EditableText
+        initialText="Hello World"
+        position={[0, 1, 0]}
+        activeStyle={activeStyle}
+      />
 
-      {/* Render the 3D toolbar for formatting */}
+      {/* Render the 3D toolbar */}
       <Toolbar3D onStyleChange={handleStyleChange} />
     </Canvas>
   );
