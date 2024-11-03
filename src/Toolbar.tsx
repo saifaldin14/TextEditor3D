@@ -6,7 +6,7 @@ import { useState } from "react";
 
 interface ToolbarProps {
   onStyleChange: (
-    style: Partial<{ bold: boolean; italic: boolean; color: string }>
+    style: Partial<{ bold: boolean; italic: boolean; color?: string }>
   ) => void;
 }
 
@@ -68,7 +68,7 @@ const Toolbar3D = ({ onStyleChange }: ToolbarProps) => {
 
   const handleClick =
     (
-      style: Partial<{ bold: boolean; italic: boolean; color: string }>,
+      style: Partial<{ bold: boolean; italic: boolean; color?: string }>,
       name: string
     ) =>
     () => {
@@ -88,8 +88,6 @@ const Toolbar3D = ({ onStyleChange }: ToolbarProps) => {
 
   return (
     <group position={[0, 3, 0]}>
-      {" "}
-      {/* Positioned slightly higher */}
       {/* Bold Button */}
       <mesh
         onClick={handleClick({ bold: true }, "bold")}
@@ -109,6 +107,7 @@ const Toolbar3D = ({ onStyleChange }: ToolbarProps) => {
           <meshStandardMaterial color="black" />
         </mesh>
       </mesh>
+
       {/* Italic Button */}
       <mesh
         onClick={handleClick({ italic: true }, "italic")}
@@ -124,11 +123,11 @@ const Toolbar3D = ({ onStyleChange }: ToolbarProps) => {
         <mesh
           position={[0, 0, 0.1]}
           geometry={createTextGeometry("Italic", 0.15)}
-          rotation={hoveredButton === "italic" ? [0, 0, -0.3] : [0, 0, 0]} // Slant for italics
         >
           <meshStandardMaterial color="black" />
         </mesh>
       </mesh>
+
       {/* Red Color Button */}
       <mesh
         onClick={handleClick({ color: "red" }, "red")}

@@ -5,11 +5,23 @@ import Toolbar3D from "./Toolbar";
 import EditableText from "./EditableText";
 
 export default function App() {
-  const [activeStyle, setActiveStyle] = useState({});
+  const [activeStyle, setActiveStyle] = useState<{
+    bold?: boolean;
+    italic?: boolean;
+    color?: string;
+  }>({});
 
-  // Handle style changes from the toolbar
-  const handleStyleChange = (style: any) => {
-    setActiveStyle((prev) => ({ ...prev, ...style }));
+  // Handle style changes from the toolbar with toggle functionality
+  const handleStyleChange = (style: Partial<typeof activeStyle>) => {
+    setActiveStyle((prev) => ({
+      ...prev,
+      ...Object.fromEntries(
+        Object.entries(style).map(([key, value]) => [
+          key,
+          prev[key as keyof typeof activeStyle] === value ? undefined : value,
+        ])
+      ),
+    }));
   };
 
   return (
