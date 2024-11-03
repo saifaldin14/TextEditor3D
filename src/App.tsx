@@ -1,38 +1,52 @@
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls, Stars } from "@react-three/drei";
-import EditableText from "./EditableText";
+import EditableRichText from "./EditableRichText";
+import { useState } from "react";
+import Toolbar3D from "./Toolbar";
+import { RichText, TextChunk } from "./types";
 
 export default function App() {
+  const [richText, setRichText] = useState<RichText>([
+    { content: "Hello, ", style: {} },
+    { content: "world!", style: { bold: true, color: "yellow" } },
+  ]);
+
+  const handleStyleChange = (style: Partial<TextChunk["style"]>) => {
+    // Modify the style of the last text chunk for simplicity
+    setRichText((prev) => {
+      const updatedChunks = [...prev];
+      const lastChunk = updatedChunks[updatedChunks.length - 1];
+      updatedChunks[updatedChunks.length - 1] = {
+        ...lastChunk,
+        style: { ...lastChunk.style, ...style },
+      };
+      return updatedChunks;
+    });
+  };
+
   return (
     <Canvas
-      camera={{ position: [0, 0, 5], fov: 60 }} // Set initial camera position
+      camera={{ position: [0, 0, 5], fov: 60 }}
       style={{ height: "100vh", backgroundColor: "black" }}
     >
-      {/* Add controls to allow user to move around the scene */}
       <OrbitControls enablePan={true} enableZoom={true} enableRotate={true} />
-
-      {/* Add stars to create a space-like environment */}
       <Stars
-        radius={100} // Radius of the star field
-        depth={50} // Depth of the star field
-        count={5000} // Number of stars
-        factor={4} // Star size factor
-        saturation={0} // Star color saturation
-        fade // Fade distant stars
-        speed={0.5} // Speed of rotation
+        radius={100}
+        depth={50}
+        count={5000}
+        factor={4}
+        saturation={0}
+        fade
+        speed={0.5}
       />
-
-      {/* Minimal lighting to illuminate the text slightly */}
       <ambientLight intensity={0.1} />
       <directionalLight intensity={0.2} position={[10, 10, 5]} />
 
-      {/* Render the editable 3D text */}
-      <EditableText
-        initialText="Click to Edit"
-        position={[0, 1, 0]}
-        fontSize={1}
-        color="lightblue"
-      />
+      {/* Render editable rich text */}
+      <EditableRichText initialText={richText} position={[0, 1, 0]} />
+
+      {/* Render the 3D toolbar for formatting */}
+      <Toolbar3D onStyleChange={handleStyleChange} />
     </Canvas>
   );
 }
