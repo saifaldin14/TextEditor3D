@@ -1,26 +1,39 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { Canvas } from "@react-three/fiber";
+import { useState } from "react";
+import ThreeDText from "./ThreeDText";
 
-function App() {
+export default function App() {
+  const [text, setText] = useState("Type here");
+
+  const handleInputChange = (event: any) => {
+    setText(event.target.value);
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <>
+      <Canvas>
+        <ambientLight intensity={0.5} />
+        <ThreeDText
+          text={text}
+          position={[0, 1, 0]}
+          fontSize={1}
+          color="blue"
+        />
+      </Canvas>
+      <input
+        type="text"
+        value={text}
+        onChange={handleInputChange}
+        placeholder="Type in 3D space"
+        style={{
+          position: "absolute",
+          bottom: "20px",
+          width: "100%",
+          textAlign: "center",
+          padding: "10px",
+          fontSize: "1.5em",
+        }}
+      />
+    </>
   );
 }
-
-export default App;
