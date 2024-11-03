@@ -1,9 +1,9 @@
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls, Stars } from "@react-three/drei";
-import EditableRichText from "./EditableRichText";
 import { useState } from "react";
 import Toolbar3D from "./Toolbar";
 import { RichText, TextChunk } from "./types";
+import EditableText from "./EditableText";
 
 export default function App() {
   const [richText, setRichText] = useState<RichText>([
@@ -43,7 +43,7 @@ export default function App() {
       <directionalLight intensity={0.2} position={[10, 10, 5]} />
 
       {/* Render editable rich text */}
-      <EditableRichText initialText={richText} position={[0, 1, 0]} />
+      <EditableText initialText={"Hello World"} position={[0, 1, 0]} />
 
       {/* Render the 3D toolbar for formatting */}
       <Toolbar3D onStyleChange={handleStyleChange} />
