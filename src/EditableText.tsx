@@ -15,18 +15,19 @@ const EditableText = ({
   initialText,
   position,
   fontSize = 1,
-  color = "black",
+  color = "lightblue",
 }: EditableTextProps) => {
   const font = useLoader(FontLoader, "/fonts/helvetiker_regular.typeface.json");
   const [text, setText] = useState(initialText);
   const [isEditing, setIsEditing] = useState(false);
   const [textGeometry, setTextGeometry] = useState<TextGeometry | null>(null);
   const textMeshRef = useRef<THREE.Mesh>(null);
+  const caretRef = useRef<THREE.Mesh>(null);
+  const blinkIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   // Initialize the text geometry whenever the text or font changes
   useEffect(() => {
     if (font) {
-      // Dispose of the old geometry to prevent memory leaks
       if (textGeometry) textGeometry.dispose();
 
       const geometry = new TextGeometry(text, {
@@ -41,17 +42,15 @@ const EditableText = ({
         bevelSegments: 5,
       });
       setTextGeometry(geometry);
-    } else {
-      console.log("HEYYYYYAAAA");
     }
   }, [text, font, fontSize]);
 
-  // Toggle edit mode on click
+  // Toggle the editing mode on click
   const handleClick = () => {
     setIsEditing(true);
   };
 
-  // Capture keystrokes to edit text directly in 3D
+  // Handle keyboard events for typing and text modification
   useEffect(() => {
     if (isEditing) {
       const handleKeyDown = (event: any) => {
@@ -66,22 +65,60 @@ const EditableText = ({
         }
       };
 
-      window.addEventListener("keydown", handleKeyDown as EventListener);
-      return () =>
-        window.removeEventListener("keydown", handleKeyDown as EventListener);
+      window.addEventListener("keydown", handleKeyDown);
+      return () => window.removeEventListener("keydown", handleKeyDown);
     }
   }, [isEditing]);
 
-  return textGeometry ? (
-    <mesh
-      ref={textMeshRef}
-      position={position}
-      geometry={textGeometry}
-      onClick={handleClick}
-    >
-      <meshStandardMaterial attach="material" color={color} />
-    </mesh>
-  ) : null;
+  // Blink caret effect
+  useEffect(() => {
+    if (isEditing && caretRef.current) {
+      caretRef.current.visible = true;
+      blinkIntervalRef.current = setInterval(() => {
+        if (caretRef.current)
+          caretRef.current.visible = !caretRef.current.visible;
+      }, 500);
+    } else if (blinkIntervalRef.current) {
+      clearInterval(blinkIntervalRef.current);
+      blinkIntervalRef.current = null;
+      if (caretRef.current) caretRef.current.visible = false;
+    }
+
+    return () => {
+      if (blinkIntervalRef.current) clearInterval(blinkIntervalRef.current);
+    };
+  }, [isEditing]);
+
+  return (
+    <>
+      {/* Text mesh */}
+      {textGeometry && (
+        <mesh
+          ref={textMeshRef}
+          position={position}
+          geometry={textGeometry}
+          onClick={handleClick}
+        >
+          <meshStandardMaterial attach="material" color={color} />
+        </mesh>
+      )}
+
+      {/* Caret mesh */}
+      {isEditing && (
+        <mesh
+          ref={caretRef}
+          position={[
+            position[0] + text.length * fontSize * 0.6,
+            position[1],
+            position[2],
+          ]}
+        >
+          <planeGeometry attach="geometry" args={[0.05, fontSize]} />
+          <meshStandardMaterial attach="material" color="white" />
+        </mesh>
+      )}
+    </>
+  );
 };
 
 export default EditableText;
