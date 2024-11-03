@@ -1,39 +1,20 @@
 import { Canvas } from "@react-three/fiber";
-import { useState } from "react";
-import ThreeDText from "./ThreeDText";
+import EditableText from "./EditableText";
 
 export default function App() {
-  const [text, setText] = useState("Type here");
-
-  const handleInputChange = (event: any) => {
-    setText(event.target.value);
-  };
-
   return (
-    <>
-      <Canvas>
-        <ambientLight intensity={0.5} />
-        <ThreeDText
-          text={text}
-          position={[0, 1, 0]}
-          fontSize={1}
-          color="blue"
-        />
-      </Canvas>
-      <input
-        type="text"
-        value={text}
-        onChange={handleInputChange}
-        placeholder="Type in 3D space"
-        style={{
-          position: "absolute",
-          bottom: "20px",
-          width: "100%",
-          textAlign: "center",
-          padding: "10px",
-          fontSize: "1.5em",
-        }}
+    <Canvas>
+      {/* Add lights for visibility */}
+      <ambientLight intensity={0.5} />
+      <directionalLight position={[10, 10, 5]} intensity={1} />
+
+      {/* Render the editable 3D text */}
+      <EditableText
+        initialText="Click to Edit"
+        position={[0, 1, 0]}
+        fontSize={1}
+        color="blue"
       />
-    </>
+    </Canvas>
   );
 }
