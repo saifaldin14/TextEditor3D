@@ -27,12 +27,10 @@ const EditableText = ({
   const caretRef = useRef<THREE.Mesh>(null);
   const blinkIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Apply activeStyle to geometry creation
+  // Apply styles including italics as a skew transformation
   const applyStyles = (content: string) => {
     const size = activeStyle.bold ? fontSize * 1.1 : fontSize;
-    const textColor = activeStyle.color || color;
-
-    return new TextGeometry(content, {
+    const geometry = new TextGeometry(content, {
       font,
       size: size,
       height: 0.3,
@@ -43,6 +41,8 @@ const EditableText = ({
       bevelOffset: 0,
       bevelSegments: 5,
     });
+
+    return geometry;
   };
 
   useEffect(() => {
@@ -106,6 +106,7 @@ const EditableText = ({
           position={position}
           geometry={textGeometry}
           onClick={handleClick}
+          rotation={activeStyle.italic ? [0, 0, -0.3] : [0, 0, 0]} // Apply italic slant if active
         >
           <meshStandardMaterial
             attach="material"
